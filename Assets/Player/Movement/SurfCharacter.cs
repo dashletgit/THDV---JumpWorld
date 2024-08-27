@@ -5,9 +5,6 @@ using UnityEngine.Rendering;
 
 namespace Fragsurf.Movement {
 
-    /// <summary>
-    /// Easily add a surfable character to the scene
-    /// </summary>
     [AddComponentMenu ("Fragsurf/Surf Character")]
     public class SurfCharacter : MonoBehaviour, ISurfControllable {
 
@@ -20,7 +17,7 @@ namespace Fragsurf.Movement {
 
         [Header("Physics Settings")]
         public Vector3 colliderSize = new Vector3 (1f, 2f, 1f);
-        [HideInInspector] public ColliderType collisionType { get { return ColliderType.Box; } } // Capsule doesn't work anymore; I'll have to figure out why some other time, sorry.
+        [HideInInspector] public ColliderType collisionType { get { return ColliderType.Box; } }
         public float weight = 75f;
         public float rigidbodyPushForce = 2f;
         public bool solidCollider = false;
@@ -37,6 +34,7 @@ namespace Fragsurf.Movement {
 
         [Header ("Features")]
         public bool crouchingEnabled = true;
+        public bool alwaysRun = true;
         public bool slidingEnabled = false;
         public bool laddersEnabled = true;
         public bool supportAngledLadders = true;
@@ -48,7 +46,9 @@ namespace Fragsurf.Movement {
         [Header ("Movement Config")]
         [SerializeField]
         public MovementConfig movementConfig;
-        
+        [SerializeField] 
+        private PlayerInput playerInput;
+
         private GameObject _groundObject;
         private Vector3 _baseVelocity;
         private Collider _collider;
@@ -110,7 +110,6 @@ namespace Fragsurf.Movement {
             }
 
         }
-
         private void Start () {
             
             _colliderObject = new GameObject ("PlayerCollider");
@@ -262,39 +261,40 @@ namespace Fragsurf.Movement {
             _colliderObject.transform.rotation = Quaternion.identity;
 
         }
-        
-        private void UpdateTestBinds () {
-
-            if (Input.GetKeyDown (KeyCode.Backspace))
-                ResetPosition ();
-
-        }
-
-        private void ResetPosition () {
-            
-            moveData.velocity = Vector3.zero;
-            moveData.origin = _startPosition;
-
-        }
-
+       
         private void UpdateMoveData () {
-            
-            _moveData.verticalAxis = Input.GetAxisRaw ("Vertical");
-            _moveData.horizontalAxis = Input.GetAxisRaw ("Horizontal");
 
-            _moveData.sprinting = Input.GetButton ("Sprint");
-            
-            if (Input.GetButtonDown ("Crouch"))
+            _moveData.viewAngles = _angles;
+            _moveData.verticalAxis = playerInput.VerticalInputData();
+            _moveData.horizontalAxis = playerInput.HorizontalInputData();
+            _moveData.sprinting = playerInput.IsSprinting();
+
+            if (playerInput.IsCrouching())
                 _moveData.crouching = true;
-
-            if (!Input.GetButton ("Crouch"))
+            if (!playerInput.IsCrouching())
                 _moveData.crouching = false;
-            
+
+            if (playerInput.IsJumping())
+                _moveData.wishJump = true;
+            if (!playerInput.IsJumping())
+                _moveData.wishJump = false;
+
+            if (playerInput.AlwaysRun()) { 
+                alwaysRun = true;
+            }
+            else { alwaysRun = false; }
+
+            if (alwaysRun ==  true) {
+                _moveData.sprinting = true;
+                if (playerInput.IsSprinting()) {
+                    _moveData.sprinting = false;
+                }
+            }
+
             bool moveLeft = _moveData.horizontalAxis < 0f;
             bool moveRight = _moveData.horizontalAxis > 0f;
             bool moveFwd = _moveData.verticalAxis > 0f;
             bool moveBack = _moveData.verticalAxis < 0f;
-            bool jump = Input.GetButton ("Jump");
 
             if (!moveLeft && !moveRight)
                 _moveData.sideMove = 0f;
@@ -309,15 +309,6 @@ namespace Fragsurf.Movement {
                 _moveData.forwardMove = moveConfig.acceleration;
             else if (moveBack)
                 _moveData.forwardMove = -moveConfig.acceleration;
-            
-            if (Input.GetButtonDown ("Jump"))
-                _moveData.wishJump = true;
-
-            if (!Input.GetButton ("Jump"))
-                _moveData.wishJump = false;
-            
-            _moveData.viewAngles = _angles;
-
         }
 
         private void DisableInput () {
@@ -327,6 +318,12 @@ namespace Fragsurf.Movement {
             _moveData.sideMove = 0f;
             _moveData.forwardMove = 0f;
             _moveData.wishJump = false;
+
+        }
+        private void ResetPosition() {
+
+            moveData.velocity = Vector3.zero;
+            moveData.origin = _startPosition;
 
         }
 

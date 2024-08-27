@@ -21,7 +21,6 @@ namespace Fragsurf.Movement {
         private float slideSpeedCurrent = 0f;
         private Vector3 slideDirection = Vector3.forward;
 
-        private bool sliding = false;
         private bool wasSliding = false;
         private float slideDelay = 0f;
         
@@ -154,13 +153,11 @@ namespace Fragsurf.Movement {
 
                     }
 
-                    sliding = false;
                     if (_surfer.moveData.velocity.magnitude > _config.minimumSlideSpeed && _surfer.moveData.slidingEnabled && _surfer.moveData.crouching && slideDelay <= 0f) {
 
                         if (!wasSliding)
                             slideSpeedCurrent = Mathf.Clamp (slideSpeedCurrent * _config.slideSpeedMultiplier, _config.minimumSlideSpeed, _config.maximumSlideSpeed);
 
-                        sliding = true;
                         wasSliding = true;
                         SlideMovement ();
                         return;
