@@ -70,6 +70,7 @@ namespace Fragsurf.Movement {
 
         ///// Properties /////
 
+        public static SurfCharacter Instance { get; private set; }
         public MoveType moveType { get { return MoveType.Walk; } }
         public MovementConfig moveConfig { get { return movementConfig; } }
         public MoveData moveData { get { return _moveData; } }
@@ -99,7 +100,8 @@ namespace Fragsurf.Movement {
 		}
 		
         private void Awake () {
-            
+
+            Instance = this;    
             _controller.playerTransform = playerRotationTransform;
             
             if (viewTransform != null) {

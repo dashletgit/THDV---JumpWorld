@@ -56,7 +56,6 @@ public class PlayerInput : MonoBehaviour {
         } else if (alwaysRun == true && Input.GetKeyDown(movementToggle)) {
             alwaysRun = false;
         }
-        Debug.Log(alwaysRun);
         return alwaysRun;
     }
 }
