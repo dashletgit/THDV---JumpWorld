@@ -8,11 +8,11 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - AllowStep
   - Water
   - UI
   - Geometria
-  - Escaleras
+  - Player
   - 
   - 
   - 

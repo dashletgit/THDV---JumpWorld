@@ -292,6 +292,10 @@ namespace Fragsurf.Movement {
                     _moveData.sprinting = false;
                 }
             }
+            if (_moveData.sideMove == 0f && _moveData.forwardMove == 0f) {
+                _moveData.moving = false;
+            } 
+            else { _moveData.moving = true; }
 
             bool moveLeft = _moveData.horizontalAxis < 0f;
             bool moveRight = _moveData.horizontalAxis > 0f;
@@ -377,8 +381,6 @@ namespace Fragsurf.Movement {
             moveData.velocity = newVelocity;
 
         }
-
     }
-
 }
 
