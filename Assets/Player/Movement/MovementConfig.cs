@@ -6,8 +6,9 @@ namespace Fragsurf.Movement {
 
         [Header ("Jumping and gravity")]
         public bool autoBhop = true;
-        public float gravity = 20f;
-        public float jumpForce = 6.5f;
+        public float gravity = 25f;
+        public float jumpForce = 10f;
+        public float airJumpMultiplier = 1.4f;
         
         [Header ("General physics")]
         public float friction = 6f;

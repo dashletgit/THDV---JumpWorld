@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fragsurf.TraceUtil;
+using UnityEngine.Assertions.Must;
 
 namespace Fragsurf.Movement {
     public class SurfController {
@@ -11,9 +12,10 @@ namespace Fragsurf.Movement {
         private MovementConfig _config;
         private float _deltaTime;
 
-        public bool jumping = false;
-        public bool crouching = false;
-        public float speed = 0f;
+        private bool canAirJump;
+        private bool jumping;
+        private bool crouching;
+        private float speed = 0f;
         
         public Transform camera;
         public float cameraYPos = 0f;
@@ -33,9 +35,6 @@ namespace Fragsurf.Movement {
 
         Vector3 groundNormal = Vector3.up;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void ProcessMovement (ISurfControllable surfer, MovementConfig config, float deltaTime) {
             
             // cache instead of passing around parameters
@@ -49,7 +48,6 @@ namespace Fragsurf.Movement {
                 LadderCheck (new Vector3(1f, 0.95f, 1f), _surfer.moveData.velocity * Mathf.Clamp (Time.deltaTime * 2f, 0.025f, 0.25f));
 
             }
-            
             if (_surfer.moveData.laddersEnabled && _surfer.moveData.climbingLadder) {
                 
                 LadderPhysics ();
@@ -62,7 +60,7 @@ namespace Fragsurf.Movement {
                 // apply gravity
                 if (_surfer.groundObject == null) {
 
-                    _surfer.moveData.velocity.y -= (_surfer.moveData.gravityFactor * _config.gravity * _deltaTime);
+                    _surfer.moveData.velocity.y -= _config.gravity * _deltaTime;
                     _surfer.moveData.velocity.y += _surfer.baseVelocity.y * _deltaTime;
 
                 }
@@ -110,26 +108,16 @@ namespace Fragsurf.Movement {
                 }
 
             }
-
-            _surfer.moveData.groundedTemp = _surfer.moveData.grounded;
-
             _surfer = null;
-            
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void CalculateMovementVelocity () {
             switch (_surfer.moveType) {
 
                 case MoveType.Walk:
 
                 if (_surfer.groundObject == null) {
-
-                    /*
-                    // AIR MOVEMENT
-                    */
+                    //Air Movement
 
                     wasSliding = false;
 
@@ -139,18 +127,19 @@ namespace Fragsurf.Movement {
                     // let the magic happen
                     SurfPhysics.Reflect (ref _surfer.moveData.velocity, _surfer.collider, _surfer.moveData.origin, _deltaTime);
 
-                } else {
-
-                    /*
-                    //  GROUND MOVEMENT
-                    */
+                    // air jump
+                        if (canAirJump && _surfer.moveData.wishJump) {
+                            Jump(_config.airJumpMultiplier);
+                        }
+                } 
+                else {
+                    //Ground Movement
 
                     // Sliding
                     if (!wasSliding) {
 
                         slideDirection = new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).normalized;
                         slideSpeedCurrent = Mathf.Max (_config.maximumSlideSpeed, new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).magnitude);
-
                     }
 
                     if (_surfer.moveData.velocity.magnitude > _config.minimumSlideSpeed && _surfer.moveData.slidingEnabled && _surfer.moveData.crouching && slideDelay <= 0f) {
@@ -173,7 +162,18 @@ namespace Fragsurf.Movement {
                         wasSliding = false;
 
                     }
-                    
+                        // Jump and friction
+                        if (_surfer.moveData.wishJump) {
+                            ApplyFriction(0.0f, true, true);
+                            Jump();
+
+                            return;
+
+                        } else {
+
+                            ApplyFriction(1.0f * frictionMult, true, true);
+                        }
+
                     float fric = crouching ? _config.crouchFriction : _config.friction;
                     float accel = crouching ? _config.crouchAcceleration : _config.acceleration;
                     float decel = crouching ? _config.crouchDeceleration : _config.deceleration;
@@ -187,19 +187,6 @@ namespace Fragsurf.Movement {
                         speed = _config.crouchSpeed;
 
                     Vector3 _wishDir;
-
-                    // Jump and friction
-                    if (_surfer.moveData.wishJump) {
-
-                        ApplyFriction (0.0f, true, true);
-                        Jump ();
-                        return;
-
-                    } else {
-
-                        ApplyFriction (1.0f * frictionMult, true, true);
-
-                    }
 
                     float forwardMove = _surfer.moveData.verticalAxis;
                     float rightMove = _surfer.moveData.horizontalAxis;
@@ -228,14 +215,11 @@ namespace Fragsurf.Movement {
                     // Apply the Y-movement from slopes
                     _surfer.moveData.velocity.y = yVelocityNew * (_wishDir.y < 0f ? 1.2f : 1.0f);
                     float removableYVelocity = _surfer.moveData.velocity.y - yVelocityNew;
-
                 }
-
                 break;
 
             } // END OF SWITCH STATEMENT
         }
-
         private void UnderwaterPhysics () {
 
             _surfer.moveData.velocity = Vector3.Lerp (_surfer.moveData.velocity, Vector3.zero, _config.underwaterVelocityDampening * _deltaTime);
@@ -299,7 +283,6 @@ namespace Fragsurf.Movement {
                 _surfer.moveData.velocity.y = Mathf.Max (_surfer.moveData.velocity.y, _config.jumpForce);
 
         }
-        
         private void LadderCheck (Vector3 colliderScale, Vector3 direction) {
 
             if (_surfer.moveData.velocity.sqrMagnitude <= 0f)
@@ -367,7 +350,6 @@ namespace Fragsurf.Movement {
             }
 
         }
-
         private void LadderPhysics () {
             
             _surfer.moveData.ladderVelocity = _surfer.moveData.ladderClimbDir * _surfer.moveData.verticalAxis * 6f;
@@ -394,7 +376,6 @@ namespace Fragsurf.Movement {
             }
             
         }
-        
         private void Accelerate (Vector3 wishDir, float wishSpeed, float acceleration, bool yMovement) {
 
             // Initialise variables
@@ -419,7 +400,6 @@ namespace Fragsurf.Movement {
             _surfer.moveData.velocity.z += _accelerationSpeed * wishDir.z;
 
         }
-
         private void ApplyFriction (float t, bool yAffected, bool grounded) {
 
             // Initialise variables
@@ -459,11 +439,6 @@ namespace Fragsurf.Movement {
             _surfer.moveData.velocity.z *= _newSpeed;
 
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         private Vector3 AirInputMovement () {
 
             Vector3 wishVel, wishDir;
@@ -481,13 +456,6 @@ namespace Fragsurf.Movement {
             return SurfPhysics.AirAccelerate (_surfer.moveData.velocity, wishDir, wishSpeed, _config.airAcceleration, _config.airCap, _deltaTime);
 
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wishVel"></param>
-        /// <param name="wishDir"></param>
-        /// <param name="wishSpeed"></param>
         private void GetWishValues (out Vector3 wishVel, out Vector3 wishDir, out float wishSpeed) {
 
             wishVel = Vector3.zero;
@@ -510,25 +478,15 @@ namespace Fragsurf.Movement {
             wishDir = wishVel.normalized;
 
         }
+        private void Jump (float multiplier = 1f) {
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="velocity"></param>
-        /// <param name="jumpPower"></param>
-        private void Jump () {
-            
             if (!_config.autoBhop)
                 _surfer.moveData.wishJump = false;
-            
-            _surfer.moveData.velocity.y += _config.jumpForce;
+
+            canAirJump = false;
             jumping = true;
-
+            _surfer.moveData.velocity.y += _config.jumpForce * multiplier;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
         private bool CheckGrounded () {
 
             _surfer.moveData.surfaceFriction = 1f;
@@ -536,11 +494,10 @@ namespace Fragsurf.Movement {
             var trace = TraceToFloor ();
 
             float groundSteepness = Vector3.Angle (Vector3.up, trace.planeNormal);
-
+            Debug.Log(_surfer.groundObject);
             if (trace.hitCollider == null || groundSteepness > _config.slopeLimit || (jumping && _surfer.moveData.velocity.y > 0f)) {
 
-                SetGround (null);
-
+                SetGround(null);
                 if (movingUp && _surfer.moveType != MoveType.Noclip)
                     _surfer.moveData.surfaceFriction = _config.airFriction;
                 
@@ -551,44 +508,22 @@ namespace Fragsurf.Movement {
                 groundNormal = trace.planeNormal;
                 SetGround (trace.hitCollider.gameObject);
                 return true;
-
             }
-
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
         private void SetGround (GameObject obj) {
 
             if (obj != null) {
-
                 _surfer.groundObject = obj;
                 _surfer.moveData.velocity.y = 0;
-
+                canAirJump = true;
             } else
-                _surfer.groundObject = null;
-
+                _surfer.groundObject = null;      
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <param name="layerMask"></param>
-        /// <returns></returns>
         private Trace TraceBounds (Vector3 start, Vector3 end, int layerMask) {
 
             return Tracer.TraceCollider (_surfer.collider, start, end, layerMask);
 
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         private Trace TraceToFloor () {
 
             var down = _surfer.moveData.origin;
@@ -597,7 +532,6 @@ namespace Fragsurf.Movement {
             return Tracer.TraceCollider (_surfer.collider, _surfer.moveData.origin, down, SurfPhysics.groundLayerMask);
 
         }
-
         public void Crouch (ISurfControllable surfer, MovementConfig config, float deltaTime) {
 
             _surfer = surfer;
@@ -732,7 +666,6 @@ namespace Fragsurf.Movement {
                 _surfer.moveData.viewTransform.localPosition = Vector3.Lerp (_surfer.moveData.viewTransformDefaultLocalPos - Vector3.down * heightDifference * 0.5f, _surfer.moveData.viewTransformDefaultLocalPos * crouchingHeight, crouchLerp);
 
         }
-
         void SlideMovement () {
             
             // Gradually change direction
@@ -750,14 +683,15 @@ namespace Fragsurf.Movement {
             _surfer.moveData.velocity = slideForward * slideSpeedCurrent;
             
             // Jump
+            /*
             if (_surfer.moveData.wishJump && slideSpeedCurrent < _config.minimumSlideSpeed * _config.slideSpeedMultiplier) {
 
                 Jump ();
                 return;
 
             }
+            */
 
         }
-
     }
 }

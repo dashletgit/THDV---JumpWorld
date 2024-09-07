@@ -24,7 +24,6 @@ namespace Fragsurf.Movement {
         public float sideMove;
         public float upMove;
         public float surfaceFriction = 1f;
-        public float gravityFactor = 1f;
         public float walkFactor = 1f;
         public float verticalAxis = 0f;
         public float horizontalAxis = 0f;

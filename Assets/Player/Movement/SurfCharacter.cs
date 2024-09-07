@@ -110,7 +110,6 @@ namespace Fragsurf.Movement {
                 _controller.cameraYPos = viewTransform.localPosition.y;
 
             }
-
         }
         private void Start () {
             
@@ -189,9 +188,7 @@ namespace Fragsurf.Movement {
                 defaultHeight = capc.height;
 
                 break;
-
             }
-
             _moveData.slopeLimit = movementConfig.slopeLimit;
 
             _moveData.rigidbodyPushForce = rigidbodyPushForce;
@@ -214,13 +211,11 @@ namespace Fragsurf.Movement {
 
             _moveData.useStepOffset = useStepOffset;
             _moveData.stepOffset = stepOffset;
-
         }
 
         private void Update () {
 
             _colliderObject.transform.rotation = Quaternion.identity;
-
 
             //UpdateTestBinds ();
             UpdateMoveData ();
@@ -243,11 +238,8 @@ namespace Fragsurf.Movement {
 
                     if (trigger.GetComponentInParent<Water> ())
                         underwater = true;
-
                 }
-
             }
-
             _moveData.cameraUnderwater = _cameraWaterCheck.IsUnderwater ();
             _cameraWaterCheckObject.transform.position = viewTransform.position;
             moveData.underwater = underwater;
@@ -261,7 +253,6 @@ namespace Fragsurf.Movement {
             prevPosition = transform.position;
 
             _colliderObject.transform.rotation = Quaternion.identity;
-
         }
        
         private void UpdateMoveData () {
@@ -316,7 +307,6 @@ namespace Fragsurf.Movement {
             else if (moveBack)
                 _moveData.forwardMove = -moveConfig.acceleration;
         }
-
         private void DisableInput () {
 
             _moveData.verticalAxis = 0f;
@@ -326,13 +316,6 @@ namespace Fragsurf.Movement {
             _moveData.wishJump = false;
 
         }
-        private void ResetPosition() {
-
-            moveData.velocity = Vector3.zero;
-            moveData.origin = _startPosition;
-
-        }
-
         /// <summary>
         /// 
         /// </summary>
