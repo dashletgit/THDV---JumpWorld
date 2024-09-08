@@ -20,6 +20,7 @@ namespace Fragsurf.Movement {
         public Vector3 origin;
         public Vector3 viewAngles;
         public Vector3 velocity;
+        public float speed;
         public float forwardMove;
         public float sideMove;
         public float upMove;
@@ -27,10 +28,11 @@ namespace Fragsurf.Movement {
         public float walkFactor = 1f;
         public float verticalAxis = 0f;
         public float horizontalAxis = 0f;
-        public bool wishJump = false;
-        public bool crouching = false;
-        public bool sprinting = false;
-        public bool moving = false;
+        public bool wishJump;
+        public bool jumping;
+        public bool crouching;
+        public bool sprinting;
+        public bool moving;
 
         public float slopeLimit = 45f;
 
@@ -39,26 +41,26 @@ namespace Fragsurf.Movement {
         public float defaultHeight = 2f;
         public float crouchingHeight = 1f;
         public float crouchingSpeed = 10f;
-        public bool toggleCrouch = false;
+        public bool toggleCrouch;
 
-        public bool slidingEnabled = false;
-        public bool laddersEnabled = false;
-        public bool angledLaddersEnabled = false;
+        public bool slidingEnabled;
+        public bool laddersEnabled;
+        public bool angledLaddersEnabled;
         
-        public bool climbingLadder = false;
+        public bool climbingLadder;
         public Vector3 ladderNormal = Vector3.zero;
         public Vector3 ladderDirection = Vector3.forward;
         public Vector3 ladderClimbDir = Vector3.up;
         public Vector3 ladderVelocity = Vector3.zero;
 
-        public bool underwater = false;
-        public bool cameraUnderwater = false;
+        public bool underwater;
+        public bool cameraUnderwater;
 
-        public bool grounded = false;
-        public bool groundedTemp = false;
-        public float fallingVelocity = 0f;
+        public bool grounded;
+        public bool groundedTemp;
+        public float fallingVelocity;
 
-        public bool useStepOffset = false;
+        public bool useStepOffset;
         public float stepOffset = 0f; 
 
     }

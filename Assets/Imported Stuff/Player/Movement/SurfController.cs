@@ -13,9 +13,7 @@ namespace Fragsurf.Movement {
         private float _deltaTime;
 
         private bool canAirJump;
-        private bool jumping;
         private bool crouching;
-        private float speed = 0f;
         
         public Transform camera;
         public float cameraYPos = 0f;
@@ -55,7 +53,7 @@ namespace Fragsurf.Movement {
             } else if (!_surfer.moveData.underwater) {
 
                 if (_surfer.moveData.velocity.y <= 0f)
-                    jumping = false;
+                    _surfer.moveData.jumping = false;
 
                 // apply gravity
                 if (_surfer.groundObject == null) {
@@ -79,7 +77,7 @@ namespace Fragsurf.Movement {
             float yVel = _surfer.moveData.velocity.y;
             _surfer.moveData.velocity.y = 0f;
             _surfer.moveData.velocity = Vector3.ClampMagnitude (_surfer.moveData.velocity, _config.maxVelocity);
-            speed =  _surfer.moveData.velocity.magnitude;
+            _surfer.moveData.speed = _surfer.moveData.velocity.magnitude;
             _surfer.moveData.velocity.y = yVel;
             
             if (_surfer.moveData.velocity.sqrMagnitude == 0f) {
@@ -484,7 +482,7 @@ namespace Fragsurf.Movement {
                 _surfer.moveData.wishJump = false;
 
             canAirJump = false;
-            jumping = true;
+            _surfer.moveData.jumping = true;
             _surfer.moveData.velocity.y += _config.jumpForce * multiplier;
         }
         private bool CheckGrounded () {
@@ -494,8 +492,7 @@ namespace Fragsurf.Movement {
             var trace = TraceToFloor ();
 
             float groundSteepness = Vector3.Angle (Vector3.up, trace.planeNormal);
-            Debug.Log(_surfer.groundObject);
-            if (trace.hitCollider == null || groundSteepness > _config.slopeLimit || (jumping && _surfer.moveData.velocity.y > 0f)) {
+            if (trace.hitCollider == null || groundSteepness > _config.slopeLimit || (_surfer.moveData.jumping && _surfer.moveData.velocity.y > 0f)) {
 
                 SetGround(null);
                 if (movingUp && _surfer.moveType != MoveType.Noclip)
@@ -516,8 +513,9 @@ namespace Fragsurf.Movement {
                 _surfer.groundObject = obj;
                 _surfer.moveData.velocity.y = 0;
                 canAirJump = true;
+                
             } else
-                _surfer.groundObject = null;      
+                _surfer.groundObject = null;
         }
         private Trace TraceBounds (Vector3 start, Vector3 end, int layerMask) {
 
@@ -683,15 +681,11 @@ namespace Fragsurf.Movement {
             _surfer.moveData.velocity = slideForward * slideSpeedCurrent;
             
             // Jump
-            /*
             if (_surfer.moveData.wishJump && slideSpeedCurrent < _config.minimumSlideSpeed * _config.slideSpeedMultiplier) {
 
                 Jump ();
                 return;
-
             }
-            */
-
         }
     }
 }

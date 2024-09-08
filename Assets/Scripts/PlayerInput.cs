@@ -12,8 +12,6 @@ public class PlayerInput : MonoBehaviour {
     [SerializeField] private KeyCode sprintWalk = KeyCode.LeftShift;
     [SerializeField] private KeyCode movementToggle = KeyCode.T;
     private bool alwaysRun;
-    [SerializeField] private GameObject vampiro;
-
     public float HorizontalInputData() {
 
         if (Input.GetKey(moveLeft)) {

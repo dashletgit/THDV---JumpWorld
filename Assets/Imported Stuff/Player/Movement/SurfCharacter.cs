@@ -14,6 +14,8 @@ namespace Fragsurf.Movement {
         }
 
         ///// Fields /////
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private AudioSource audioSource;
 
         [Header("Physics Settings")]
         public Vector3 colliderSize = new Vector3 (1f, 2f, 1f);
@@ -29,8 +31,8 @@ namespace Fragsurf.Movement {
         [Header ("Crouching setup")]
         public float crouchingHeightMultiplier = 0.5f;
         public float crouchingSpeed = 10f;
-        float defaultHeight;
-        bool allowCrouch = true; // This is separate because you shouldn't be able to toggle crouching on and off during gameplay for various reasons
+        private float defaultHeight;
+        private bool allowCrouch = true;
 
         [Header ("Features")]
         public bool crouchingEnabled = true;
@@ -39,15 +41,17 @@ namespace Fragsurf.Movement {
         public bool laddersEnabled = true;
         public bool supportAngledLadders = true;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip jumpAudio;
+        [SerializeField] private AudioClip fallAudio;
+
         [Header ("Step offset (can be buggy, enable at your own risk)")]
         public bool useStepOffset = false;
         public float stepOffset = 0.35f;
 
         [Header ("Movement Config")]
-        [SerializeField]
-        public MovementConfig movementConfig;
-        [SerializeField] 
-        private PlayerInput playerInput;
+
+        [SerializeField] public MovementConfig movementConfig;
 
         private GameObject _groundObject;
         private Vector3 _baseVelocity;
@@ -66,7 +70,9 @@ namespace Fragsurf.Movement {
         private List<Collider> triggers = new List<Collider> ();
         private int numberOfTriggers = 0;
 
-        private bool underwater = false;
+        private bool underwater;
+        private bool audioPlaying;
+        private bool bigFall;
 
         ///// Properties /////
 
@@ -213,12 +219,15 @@ namespace Fragsurf.Movement {
             _moveData.stepOffset = stepOffset;
         }
 
-        private void Update () {
+        private void Update() {
+            Debug.Log("Speed: " + _moveData.speed);
+            Debug.Log("VelocityY: " + _moveData.velocity.y);
+            Debug.Log("Grounded: " + _moveData.grounded);
 
             _colliderObject.transform.rotation = Quaternion.identity;
 
             //UpdateTestBinds ();
-            UpdateMoveData ();
+            UpdateMoveData();
             
             // Previous movement code
             Vector3 positionalMovement = transform.position - prevPosition;
@@ -249,13 +258,14 @@ namespace Fragsurf.Movement {
 
             _controller.ProcessMovement (this, movementConfig, Time.deltaTime);
 
+            HandleAudio();
             transform.position = moveData.origin;
             prevPosition = transform.position;
 
             _colliderObject.transform.rotation = Quaternion.identity;
         }
        
-        private void UpdateMoveData () {
+        private void UpdateMoveData() {
 
             _moveData.viewAngles = _angles;
             _moveData.verticalAxis = playerInput.VerticalInputData();
@@ -288,6 +298,15 @@ namespace Fragsurf.Movement {
             } 
             else { _moveData.moving = true; }
 
+            if (_moveData.velocity.y <= -12f) {
+                bigFall = true;
+            }
+
+            if (_groundObject != null) {
+                _moveData.grounded = true;
+            } 
+            else { _moveData.grounded = false; }
+
             bool moveLeft = _moveData.horizontalAxis < 0f;
             bool moveRight = _moveData.horizontalAxis > 0f;
             bool moveFwd = _moveData.verticalAxis > 0f;
@@ -307,7 +326,7 @@ namespace Fragsurf.Movement {
             else if (moveBack)
                 _moveData.forwardMove = -moveConfig.acceleration;
         }
-        private void DisableInput () {
+        private void DisableInput() {
 
             _moveData.verticalAxis = 0f;
             _moveData.horizontalAxis = 0f;
@@ -316,13 +335,26 @@ namespace Fragsurf.Movement {
             _moveData.wishJump = false;
 
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="angle"></param>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <returns></returns>
+        private void HandleAudio() {
+            if (!_moveData.jumping) {
+                audioPlaying = false;
+            } 
+            if (_moveData.jumping) {
+                PlayAudioOnce(jumpAudio);
+            }
+            if (_moveData.grounded && bigFall && !_moveData.wishJump) {
+                PlayAudioOnce(fallAudio);
+                bigFall = false;
+            }
+        }
+        private void PlayAudioOnce(AudioClip clip) {
+            audioSource.clip = clip;
+
+            if (!audioPlaying) {
+                audioSource.Play();
+                audioPlaying = true;
+            }
+        }
         public static float ClampAngle (float angle, float from, float to) {
 
             if (angle < 0f)
