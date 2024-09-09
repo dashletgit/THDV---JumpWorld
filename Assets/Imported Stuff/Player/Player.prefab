@@ -222,6 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bb74e58b35dc614bbb4f53d57a788fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stepHeight: 0.5
 --- !u!1 &5467285083954485886
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,8 +369,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5467285084242854812}
-  - component: {fileID: 5467285084242854815}
   - component: {fileID: 6220058684048978430}
+  - component: {fileID: 5467285084242854815}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -396,6 +397,26 @@ Transform:
   - {fileID: 1984447428936597636}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6220058684048978430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5467285084242854813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27eeca5ca80ab2d40b07e0a8efff6588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveFoward: 119
+  moveBack: 115
+  moveLeft: 97
+  moveRight: 100
+  jump: 32
+  crouch: 306
+  sprintWalk: 304
+  movementToggle: 116
 --- !u!114 &5467285084242854815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,6 +450,7 @@ MonoBehaviour:
   stepOffset: 0.5
   movementConfig:
     autoBhop: 1
+    airJumpAllowed: 0
     gravity: 27
     jumpForce: 10
     airJumpMultiplier: 1.5
@@ -461,27 +483,6 @@ MonoBehaviour:
     underwaterFriction: 2
     underwaterGravity: 6
     underwaterVelocityDampening: 2
---- !u!114 &6220058684048978430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5467285084242854813}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27eeca5ca80ab2d40b07e0a8efff6588, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveFoward: 119
-  moveBack: 115
-  moveLeft: 97
-  moveRight: 100
-  jump: 32
-  crouch: 306
-  sprintWalk: 304
-  movementToggle: 116
-  vampiro: {fileID: 0}
 --- !u!1 &5467285085316221438
 GameObject:
   m_ObjectHideFlags: 0

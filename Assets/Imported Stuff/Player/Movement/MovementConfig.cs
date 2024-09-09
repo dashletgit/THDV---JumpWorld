@@ -6,6 +6,7 @@ namespace Fragsurf.Movement {
 
         [Header ("Jumping and gravity")]
         public bool autoBhop = true;
+        public bool airJumpAllowed = false;
         public float gravity = 25f;
         public float jumpForce = 10f;
         public float airJumpMultiplier = 1.4f;

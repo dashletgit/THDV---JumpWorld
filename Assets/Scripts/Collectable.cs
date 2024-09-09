@@ -7,6 +7,10 @@ public class Collectable : MonoBehaviour
     [SerializeField] private SpriteRenderer sprite;
     [SerializeField] private float collectableValue;
     private void Update() {
+        LookAtPlayer();
+    }
+
+    private void LookAtPlayer() {
         Vector3 targetDir = SurfCharacter.Instance.transform.position - transform.position;
         Vector3 rotation = Quaternion.LookRotation(targetDir).eulerAngles;
         transform.rotation = Quaternion.Euler(0, rotation.y, 0);

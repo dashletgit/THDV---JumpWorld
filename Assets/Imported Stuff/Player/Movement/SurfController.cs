@@ -126,7 +126,7 @@ namespace Fragsurf.Movement {
                     SurfPhysics.Reflect (ref _surfer.moveData.velocity, _surfer.collider, _surfer.moveData.origin, _deltaTime);
 
                     // air jump
-                        if (canAirJump && _surfer.moveData.wishJump) {
+                        if (canAirJump && _surfer.moveData.wishJump && _config.airJumpAllowed) {
                             Jump(_config.airJumpMultiplier);
                         }
                 } 
@@ -190,8 +190,8 @@ namespace Fragsurf.Movement {
                     float rightMove = _surfer.moveData.horizontalAxis;
 
                     _wishDir = forwardMove * forward + rightMove * right;
-                    _wishDir.Normalize ();
-                    Vector3 moveDirNorm = _wishDir;
+                    _wishDir.Normalize();
+                    _surfer.moveData.wishDir = _wishDir;
 
                     Vector3 forwardVelocity = Vector3.Cross (groundNormal, Quaternion.AngleAxis (-90, Vector3.up) * new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z));
 
@@ -201,18 +201,17 @@ namespace Fragsurf.Movement {
 
                     // Accelerate
                     float yVel = _surfer.moveData.velocity.y;
-                    Accelerate (_wishDir, _wishSpeed, accel * Mathf.Min (frictionMult, 1f), false);
+                    Accelerate(_wishDir, _wishSpeed, accel * Mathf.Min(frictionMult, 1f), false);
 
                     float maxVelocityMagnitude = _config.maxVelocity;
-                    _surfer.moveData.velocity = Vector3.ClampMagnitude (new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z), maxVelocityMagnitude);
+                    _surfer.moveData.velocity = Vector3.ClampMagnitude(new Vector3(_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z), maxVelocityMagnitude);
                     _surfer.moveData.velocity.y = yVel;
 
                     // Calculate how much slopes should affect movement
-                    float yVelocityNew = forwardVelocity.normalized.y * new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).magnitude;
+                    float yVelocityNew = forwardVelocity.normalized.y * new Vector3(_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).magnitude;
 
                     // Apply the Y-movement from slopes
                     _surfer.moveData.velocity.y = yVelocityNew * (_wishDir.y < 0f ? 1.2f : 1.0f);
-                    float removableYVelocity = _surfer.moveData.velocity.y - yVelocityNew;
                 }
                 break;
 
@@ -501,19 +500,18 @@ namespace Fragsurf.Movement {
                 return false;
 
             } else {
-
-                groundNormal = trace.planeNormal;
                 SetGround (trace.hitCollider.gameObject);
+                groundNormal = trace.planeNormal;
+                  
                 return true;
             }
         }
         private void SetGround (GameObject obj) {
 
             if (obj != null) {
-                _surfer.groundObject = obj;
-                _surfer.moveData.velocity.y = 0;
                 canAirJump = true;
-                
+                _surfer.groundObject = obj;
+
             } else
                 _surfer.groundObject = null;
         }

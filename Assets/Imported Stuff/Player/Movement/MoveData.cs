@@ -20,6 +20,7 @@ namespace Fragsurf.Movement {
         public Vector3 origin;
         public Vector3 viewAngles;
         public Vector3 velocity;
+        public Vector3 wishDir;
         public float speed;
         public float forwardMove;
         public float sideMove;
