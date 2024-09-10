@@ -17,42 +17,6 @@ namespace Fragsurf.Movement {
         [SerializeField] private PlayerInput playerInput;
         [SerializeField] private AudioSource audioSource;
 
-        [Header("Physics Settings")]
-        public Vector3 colliderSize = new Vector3 (1f, 2f, 1f);
-        [HideInInspector] public ColliderType collisionType { get { return ColliderType.Box; } }
-        public float weight = 75f;
-        public float rigidbodyPushForce = 2f;
-        public bool solidCollider = false;
-
-        [Header("View Settings")]
-        public Transform viewTransform;
-        public Transform playerRotationTransform;
-
-        [Header ("Crouching setup")]
-        public float crouchingHeightMultiplier = 0.5f;
-        public float crouchingSpeed = 10f;
-        private float defaultHeight;
-        private bool allowCrouch = true;
-
-        [Header ("Features")]
-        public bool crouchingEnabled = true;
-        public bool alwaysRun = true;
-        public bool slidingEnabled = false;
-        public bool laddersEnabled = true;
-        public bool supportAngledLadders = true;
-
-        [Header("Audio")]
-        [SerializeField] private AudioClip jumpAudio;
-        [SerializeField] private AudioClip fallAudio;
-
-        [Header ("Step offset (can be buggy, enable at your own risk)")]
-        public bool useStepOffset = false;
-        public float stepOffset = 0.35f;
-
-        [Header ("Movement Config")]
-
-        [SerializeField] public MovementConfig movementConfig;
-
         private GameObject _groundObject;
         private Vector3 _baseVelocity;
         private Collider _collider;
@@ -62,17 +26,54 @@ namespace Fragsurf.Movement {
         private GameObject _cameraWaterCheckObject;
         private CameraWaterCheck _cameraWaterCheck;
 
-        private MoveData _moveData = new MoveData ();
-        private SurfController _controller = new SurfController ();
+        private MoveData _moveData = new MoveData();
+        private SurfController _controller = new SurfController();
 
         private Rigidbody rb;
 
-        private List<Collider> triggers = new List<Collider> ();
+        private List<Collider> triggers = new List<Collider>();
         private int numberOfTriggers = 0;
 
-        private bool underwater;
+        //private bool underwater;
         private bool audioPlaying;
         private bool bigFall;
+        private bool inputDisable;
+
+        [Header("Physics Settings")]
+        public Vector3 colliderSize = new Vector3 (1f, 2f, 1f);
+        public float weight = 75f;
+        public float rigidbodyPushForce = 2f;
+        public bool solidCollider = false;
+        [HideInInspector] public ColliderType collisionType { get { return ColliderType.Box; } }
+
+        [Header("View Settings")]
+        public Transform viewTransform;
+        public Transform playerRotationTransform;
+        [SerializeField] private PlayerAiming playerCamera;
+
+        [Header ("Crouching Setup")]
+        public float crouchingHeightMultiplier = 0.5f;
+        public float crouchingSpeed = 10f;
+        private float defaultHeight;
+        private bool allowCrouch = true;
+
+        [Header ("Features")]
+        public bool crouchingEnabled = false;
+        public bool alwaysRun = false;
+        private bool slidingEnabled = false;
+        private bool laddersEnabled = false;
+        private bool supportAngledLadders = false;
+
+        [Header("Audio")]
+        [SerializeField] private AudioClip jumpAudio;
+        [SerializeField] private AudioClip fallAudio;
+
+        //Step Offset (Buggy)
+        private bool useStepOffset = false;
+        private float stepOffset = 0.35f;
+
+        [Header ("Movement Config")]
+        [SerializeField] public MovementConfig movementConfig;
 
         ///// Properties /////
 
@@ -224,11 +225,8 @@ namespace Fragsurf.Movement {
             Debug.Log("VelocityY: " + _moveData.velocity.y);
             Debug.Log("Grounded: " + _moveData.grounded);
 
-            _colliderObject.transform.rotation = Quaternion.identity;
-
-            //UpdateTestBinds ();
             UpdateMoveData();
-            
+
             // Previous movement code
             Vector3 positionalMovement = transform.position - prevPosition;
             transform.position = prevPosition;
@@ -238,39 +236,42 @@ namespace Fragsurf.Movement {
             if (numberOfTriggers != triggers.Count) {
                 numberOfTriggers = triggers.Count;
 
-                underwater = false;
+                //underwater = false;
                 triggers.RemoveAll (item => item == null);
                 foreach (Collider trigger in triggers) {
 
                     if (trigger == null)
                         continue;
 
-                    if (trigger.GetComponentInParent<Water> ())
-                        underwater = true;
+                    if (trigger.GetComponentInParent<Water>()) {
+                        Debug.LogWarning("Water is disable");
+                    }
+                        //underwater = true;
                 }
             }
-            _moveData.cameraUnderwater = _cameraWaterCheck.IsUnderwater ();
-            _cameraWaterCheckObject.transform.position = viewTransform.position;
-            moveData.underwater = underwater;
-            
-            if (allowCrouch)
-                _controller.Crouch (this, movementConfig, Time.deltaTime);
+
+            //Underwater camera
+            //_moveData.cameraUnderwater = _cameraWaterCheck.IsUnderwater ();
+            //_cameraWaterCheckObject.transform.position = viewTransform.position;
+            //moveData.underwater = underwater;
+
+            if (allowCrouch) {
+                _controller.Crouch(this, movementConfig, Time.deltaTime);
+            }
 
             _controller.ProcessMovement (this, movementConfig, Time.deltaTime);
-
             HandleAudio();
             transform.position = moveData.origin;
             prevPosition = transform.position;
-
             _colliderObject.transform.rotation = Quaternion.identity;
         }
        
         private void UpdateMoveData() {
-
             _moveData.viewAngles = _angles;
             _moveData.verticalAxis = playerInput.VerticalInputData();
             _moveData.horizontalAxis = playerInput.HorizontalInputData();
             _moveData.sprinting = playerInput.IsSprinting();
+            playerCamera.FreeLookDisable(moveConfig.freeLook);
 
             if (playerInput.IsCrouching())
                 _moveData.crouching = true;
@@ -325,15 +326,23 @@ namespace Fragsurf.Movement {
                 _moveData.forwardMove = moveConfig.acceleration;
             else if (moveBack)
                 _moveData.forwardMove = -moveConfig.acceleration;
+
+            if (inputDisable) {
+
+                _moveData.verticalAxis = 0f;
+                _moveData.horizontalAxis = 0f;
+                _moveData.sideMove = 0f;
+                _moveData.forwardMove = 0f;
+                _moveData.wishJump = false;
+            }
         }
-        private void DisableInput() {
-
-            _moveData.verticalAxis = 0f;
-            _moveData.horizontalAxis = 0f;
-            _moveData.sideMove = 0f;
-            _moveData.forwardMove = 0f;
-            _moveData.wishJump = false;
-
+        public void DisableInput() {
+            inputDisable = true;
+            playerCamera.DisableMouseInput();
+        }
+        public void EnableInput() {
+            inputDisable = false;
+            playerCamera.EnableMouseInput();
         }
         private void HandleAudio() {
             if (!_moveData.jumping) {

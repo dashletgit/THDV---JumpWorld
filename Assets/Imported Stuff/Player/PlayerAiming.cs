@@ -30,6 +30,9 @@ public class PlayerAiming : MonoBehaviour
 	[HideInInspector]
 	public Vector2 punchAngleVel;
 
+	private bool lockMouse;
+	private bool freeLook;
+
 	private void Start()
 	{
 		// Lock the mouse
@@ -46,24 +49,34 @@ public class PlayerAiming : MonoBehaviour
 		DecayPunchAngle();
 
 		// Input
-		float xMovement = Input.GetAxisRaw("Mouse X") * horizontalSensitivity * sensitivityMultiplier;
-		float yMovement = -Input.GetAxisRaw("Mouse Y") * verticalSensitivity  * sensitivityMultiplier;
+            float xMovement =  Input.GetAxisRaw("Mouse X") * horizontalSensitivity * sensitivityMultiplier;
+			float yMovement = -Input.GetAxisRaw("Mouse Y") * verticalSensitivity * sensitivityMultiplier;
 
-		// Calculate real rotation from input
-		realRotation   = new Vector3(Mathf.Clamp(realRotation.x + yMovement, minYRotation, maxYRotation), realRotation.y + xMovement, realRotation.z);
-		realRotation.z = Mathf.Lerp(realRotation.z, 0f, Time.deltaTime * 3f);
+            if (lockMouse) { 
+				realRotation.x = bodyTransform.rotation.eulerAngles.x;
+				realRotation.y = bodyTransform.rotation.eulerAngles.y;
+			}
 
-		//Apply real rotation to body
-		bodyTransform.eulerAngles = Vector3.Scale(realRotation, new Vector3(0f, 1f, 0f));
+			// Calculate real rotation from input
+			if (!lockMouse) {
+                realRotation = new Vector3(Mathf.Clamp(realRotation.x + yMovement, minYRotation, maxYRotation), realRotation.y + xMovement, realRotation.z);
+                realRotation.z = Mathf.Lerp(realRotation.z, 0f, Time.deltaTime * 3f);
+            }
 
-		//Apply rotation and recoil
-		Vector3 cameraEulerPunchApplied = realRotation;
-		cameraEulerPunchApplied.x += punchAngle.x;
-		cameraEulerPunchApplied.y += punchAngle.y;
 
-		transform.eulerAngles = cameraEulerPunchApplied;
+            //Apply real rotation to body
+            bodyTransform.eulerAngles = Vector3.Scale(realRotation, new Vector3(0f, 1f, 0f));
+
+            //Apply rotation and recoil
+            Vector3 cameraEulerPunchApplied = realRotation;
+            cameraEulerPunchApplied.x += punchAngle.x;
+            cameraEulerPunchApplied.y += punchAngle.y;
+
+		    //Apply vertical movement
+		    if (freeLook) {
+            transform.eulerAngles = cameraEulerPunchApplied;
+             }
 	}
-
 	public void ViewPunch(Vector2 punchAmount)
 	{
 		//Remove previous recoil
@@ -72,7 +85,6 @@ public class PlayerAiming : MonoBehaviour
 		//Recoil go up
 		punchAngleVel -= punchAmount * 20;
 	}
-
 	private void DecayPunchAngle()
 	{
 		if (punchAngle.sqrMagnitude > 0.001 || punchAngleVel.sqrMagnitude > 0.001)
@@ -94,4 +106,13 @@ public class PlayerAiming : MonoBehaviour
 			punchAngleVel = Vector2.zero;
 		}
 	}
+    public void DisableMouseInput() {
+		lockMouse = true;
+    }
+	public void FreeLookDisable(bool setBool) {
+		freeLook = setBool;
+	}
+    public void EnableMouseInput() {
+		lockMouse = false;
+    }
 }

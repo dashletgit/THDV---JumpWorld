@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1984447428936597636}
   - component: {fileID: 3556167982584047155}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 5206996464534022771}
   - component: {fileID: 5378691053395371232}
   - component: {fileID: 2671588351366858192}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: StepCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,10 +199,10 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -235,7 +235,7 @@ GameObject:
   - component: {fileID: 5467285083954485883}
   - component: {fileID: 5467285083954485880}
   - component: {fileID: 5252721729245186046}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -437,6 +437,7 @@ MonoBehaviour:
   solidCollider: 1
   viewTransform: {fileID: 5467285085316221433}
   playerRotationTransform: {fileID: 5467285084242854812}
+  playerCamera: {fileID: 5467285085316221432}
   crouchingHeightMultiplier: 0.5
   crouchingSpeed: 10
   crouchingEnabled: 0
@@ -493,7 +494,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5467285085316221433}
   - component: {fileID: 5467285085316221432}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Camera holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -549,7 +550,7 @@ GameObject:
   - component: {fileID: 8027462277005947149}
   - component: {fileID: 1487624553005901047}
   - component: {fileID: 7246767594588419325}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class PlayerInput : MonoBehaviour {
+
     [SerializeField] private KeyCode moveFoward = KeyCode.W;
     [SerializeField] private KeyCode moveBack = KeyCode.S;
     [SerializeField] private KeyCode moveLeft = KeyCode.A;

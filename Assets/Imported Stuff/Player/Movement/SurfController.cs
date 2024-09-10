@@ -58,7 +58,7 @@ namespace Fragsurf.Movement {
                 // apply gravity
                 if (_surfer.groundObject == null) {
 
-                    _surfer.moveData.velocity.y -= _config.gravity * _deltaTime;
+                    _surfer.moveData.velocity.y -= (_surfer.moveData.gravityFactor * _config.gravity * _deltaTime);
                     _surfer.moveData.velocity.y += _surfer.baseVelocity.y * _deltaTime;
 
                 }
@@ -106,6 +106,7 @@ namespace Fragsurf.Movement {
                 }
 
             }
+            _surfer.moveData.groundedTemp = _surfer.moveData.grounded;
             _surfer = null;
         }
 
@@ -160,17 +161,6 @@ namespace Fragsurf.Movement {
                         wasSliding = false;
 
                     }
-                        // Jump and friction
-                        if (_surfer.moveData.wishJump) {
-                            ApplyFriction(0.0f, true, true);
-                            Jump();
-
-                            return;
-
-                        } else {
-
-                            ApplyFriction(1.0f * frictionMult, true, true);
-                        }
 
                     float fric = crouching ? _config.crouchFriction : _config.friction;
                     float accel = crouching ? _config.crouchAcceleration : _config.acceleration;
@@ -185,6 +175,18 @@ namespace Fragsurf.Movement {
                         speed = _config.crouchSpeed;
 
                     Vector3 _wishDir;
+
+                    // Jump and friction
+                    if (_surfer.moveData.wishJump) {
+                        ApplyFriction(0.0f, true, true);
+                        Jump();
+
+                        return;
+
+                    } else {
+
+                       ApplyFriction(1.0f * frictionMult, true, true);
+                    }
 
                     float forwardMove = _surfer.moveData.verticalAxis;
                     float rightMove = _surfer.moveData.horizontalAxis;
@@ -212,7 +214,8 @@ namespace Fragsurf.Movement {
 
                     // Apply the Y-movement from slopes
                     _surfer.moveData.velocity.y = yVelocityNew * (_wishDir.y < 0f ? 1.2f : 1.0f);
-                }
+                     float removableYVelocity = _surfer.moveData.velocity.y - yVelocityNew;
+                    }
                 break;
 
             } // END OF SWITCH STATEMENT
@@ -480,9 +483,10 @@ namespace Fragsurf.Movement {
             if (!_config.autoBhop)
                 _surfer.moveData.wishJump = false;
 
+            _surfer.moveData.velocity.y += _config.jumpForce * multiplier;
             canAirJump = false;
             _surfer.moveData.jumping = true;
-            _surfer.moveData.velocity.y += _config.jumpForce * multiplier;
+            
         }
         private bool CheckGrounded () {
 
@@ -491,7 +495,7 @@ namespace Fragsurf.Movement {
             var trace = TraceToFloor ();
 
             float groundSteepness = Vector3.Angle (Vector3.up, trace.planeNormal);
-            if (trace.hitCollider == null || groundSteepness > _config.slopeLimit || (_surfer.moveData.jumping && _surfer.moveData.velocity.y > 0f)) {
+            if (trace.hitCollider == null || groundSteepness > _config.slopeLimit || _surfer.moveData.jumping && _surfer.moveData.velocity.y > 0f) {
 
                 SetGround(null);
                 if (movingUp && _surfer.moveType != MoveType.Noclip)
@@ -502,7 +506,6 @@ namespace Fragsurf.Movement {
             } else {
                 SetGround (trace.hitCollider.gameObject);
                 groundNormal = trace.planeNormal;
-                  
                 return true;
             }
         }
@@ -511,6 +514,7 @@ namespace Fragsurf.Movement {
             if (obj != null) {
                 canAirJump = true;
                 _surfer.groundObject = obj;
+                _surfer.moveData.velocity.y = 0;
 
             } else
                 _surfer.groundObject = null;

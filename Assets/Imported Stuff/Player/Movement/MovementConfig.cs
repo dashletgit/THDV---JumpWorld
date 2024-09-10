@@ -10,6 +10,9 @@ namespace Fragsurf.Movement {
         public float gravity = 25f;
         public float jumpForce = 10f;
         public float airJumpMultiplier = 1.4f;
+
+        [Header("Freelook")]
+        public bool freeLook = true;
         
         [Header ("General physics")]
         public float friction = 6f;
