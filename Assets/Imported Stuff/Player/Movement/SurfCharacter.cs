@@ -9,7 +9,6 @@ namespace Fragsurf.Movement {
     public class SurfCharacter : MonoBehaviour, ISurfControllable {
 
         public enum ColliderType {
-            Capsule,
             Box
         }
 
@@ -21,10 +20,8 @@ namespace Fragsurf.Movement {
         private Vector3 _baseVelocity;
         private Collider _collider;
         private Vector3 _angles;
-        private Vector3 _startPosition;
         private GameObject _colliderObject;
-        private GameObject _cameraWaterCheckObject;
-        private CameraWaterCheck _cameraWaterCheck;
+        private IInteractable interactable;
 
         private MoveData _moveData = new MoveData();
         private SurfController _controller = new SurfController();
@@ -127,21 +124,6 @@ namespace Fragsurf.Movement {
             _colliderObject.transform.localPosition = Vector3.zero;
             _colliderObject.transform.SetSiblingIndex (0);
 
-            // Water check
-            _cameraWaterCheckObject = new GameObject ("Camera water check");
-            _cameraWaterCheckObject.layer = gameObject.layer;
-            _cameraWaterCheckObject.transform.position = viewTransform.position;
-
-            SphereCollider _cameraWaterCheckSphere = _cameraWaterCheckObject.AddComponent<SphereCollider> ();
-            _cameraWaterCheckSphere.radius = 0.1f;
-            _cameraWaterCheckSphere.isTrigger = true;
-
-            Rigidbody _cameraWaterCheckRb = _cameraWaterCheckObject.AddComponent<Rigidbody> ();
-            _cameraWaterCheckRb.useGravity = false;
-            _cameraWaterCheckRb.isKinematic = true;
-
-            _cameraWaterCheck = _cameraWaterCheckObject.AddComponent<CameraWaterCheck> ();
-
             prevPosition = transform.position;
 
             if (viewTransform == null)
@@ -182,19 +164,6 @@ namespace Fragsurf.Movement {
                 defaultHeight = boxc.size.y;
 
                 break;
-
-                // Capsule collider
-                case ColliderType.Capsule:
-
-                _collider = _colliderObject.AddComponent<CapsuleCollider> ();
-
-                var capc = (CapsuleCollider)_collider;
-                capc.height = colliderSize.y;
-                capc.radius = colliderSize.x / 2f;
-
-                defaultHeight = capc.height;
-
-                break;
             }
             _moveData.slopeLimit = movementConfig.slopeLimit;
 
@@ -214,7 +183,6 @@ namespace Fragsurf.Movement {
             
             _collider.isTrigger = !solidCollider;
             _moveData.origin = transform.position;
-            _startPosition = transform.position;
 
             _moveData.useStepOffset = useStepOffset;
             _moveData.stepOffset = stepOffset;
@@ -236,24 +204,18 @@ namespace Fragsurf.Movement {
             if (numberOfTriggers != triggers.Count) {
                 numberOfTriggers = triggers.Count;
 
-                //underwater = false;
                 triggers.RemoveAll (item => item == null);
                 foreach (Collider trigger in triggers) {
 
                     if (trigger == null)
                         continue;
 
-                    if (trigger.GetComponentInParent<Water>()) {
-                        Debug.LogWarning("Water is disable");
+                    if (trigger.TryGetComponent(out IInteractable interactable)) { 
+                        this.interactable = interactable;
+                        Debug.Log("In Range of Interactable");
                     }
-                        //underwater = true;
                 }
             }
-
-            //Underwater camera
-            //_moveData.cameraUnderwater = _cameraWaterCheck.IsUnderwater ();
-            //_cameraWaterCheckObject.transform.position = viewTransform.position;
-            //moveData.underwater = underwater;
 
             if (allowCrouch) {
                 _controller.Crouch(this, movementConfig, Time.deltaTime);
@@ -271,6 +233,7 @@ namespace Fragsurf.Movement {
             _moveData.verticalAxis = playerInput.VerticalInputData();
             _moveData.horizontalAxis = playerInput.HorizontalInputData();
             _moveData.sprinting = playerInput.IsSprinting();
+            HandleInteractions();
             playerCamera.FreeLookDisable(moveConfig.freeLook);
 
             if (playerInput.IsCrouching())
@@ -336,6 +299,11 @@ namespace Fragsurf.Movement {
                 _moveData.wishJump = false;
             }
         }
+        private void HandleInteractions() {
+            if (playerInput.Interacted() && interactable != null) {
+                interactable.Interaction();
+            }
+        }
         public void DisableInput() {
             inputDisable = true;
             playerCamera.DisableMouseInput();
@@ -364,17 +332,6 @@ namespace Fragsurf.Movement {
                 audioPlaying = true;
             }
         }
-        public static float ClampAngle (float angle, float from, float to) {
-
-            if (angle < 0f)
-                angle = 360 + angle;
-
-            if (angle > 180f)
-                return Mathf.Max (angle, 360 + from);
-
-            return Mathf.Min (angle, to);
-
-        }
 
         private void OnTriggerEnter (Collider other) {
             
@@ -384,9 +341,11 @@ namespace Fragsurf.Movement {
         }
 
         private void OnTriggerExit (Collider other) {
-            
-            if (triggers.Contains (other))
-                triggers.Remove (other);
+
+            if (triggers.Contains(other)) {
+                triggers.Remove(other);
+                interactable = null;
+            }
 
         }
 

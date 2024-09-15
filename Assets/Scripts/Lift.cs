@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lift : MonoBehaviour
+public class Lift : MonoBehaviour, IInteractable
 {
     [SerializeField] private Transform lift;
     [SerializeField] private AudioSource audioSource;
@@ -65,8 +65,8 @@ public class Lift : MonoBehaviour
         coroutineRunning = false;
         yield break;
     }
-    private void OnTriggerStay(Collider other) {
-        if (Input.GetKeyDown(KeyCode.E) && isRaised && other.gameObject.layer == 7){
+    public void Interaction() {
+        if (isRaised) {
             isRaised = false;
             isLowered = true;
             HandleAudio(clip[0]);

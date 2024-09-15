@@ -12,6 +12,8 @@ public class PlayerInput : MonoBehaviour {
     [SerializeField] private KeyCode crouch = KeyCode.LeftControl;
     [SerializeField] private KeyCode sprintWalk = KeyCode.LeftShift;
     [SerializeField] private KeyCode movementToggle = KeyCode.T;
+    [SerializeField] private KeyCode interact = KeyCode.E;
+
     private bool alwaysRun;
     public float HorizontalInputData() {
 
@@ -46,6 +48,12 @@ public class PlayerInput : MonoBehaviour {
     }
     public bool IsSprinting() {
         if (Input.GetKey(sprintWalk)) {
+            return true;
+        }
+        return false;
+    }
+    public bool Interacted() {
+        if (Input.GetKeyDown(interact)) { 
             return true;
         }
         return false;
