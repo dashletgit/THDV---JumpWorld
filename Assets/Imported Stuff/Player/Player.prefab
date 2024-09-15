@@ -209,7 +209,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.2, y: 0.5, z: 1.2}
-  m_Center: {x: 0, y: -0.65, z: 0}
+  m_Center: {x: 0, y: -0.8, z: 0}
 --- !u!114 &2671588351366858192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -442,19 +442,15 @@ MonoBehaviour:
   crouchingSpeed: 10
   crouchingEnabled: 0
   alwaysRun: 0
-  slidingEnabled: 0
-  laddersEnabled: 0
-  supportAngledLadders: 0
   jumpAudio: {fileID: 8300000, guid: 689e7ec24e5410941ad3438072ca716f, type: 3}
   fallAudio: {fileID: 8300000, guid: fc2caed43cfdd614e861a8883596c1f2, type: 3}
-  useStepOffset: 0
-  stepOffset: 0.5
   movementConfig:
     autoBhop: 1
     airJumpAllowed: 0
-    gravity: 27
+    gravity: 28
     jumpForce: 10
     airJumpMultiplier: 1.5
+    freeLook: 1
     friction: 6
     maxSpeed: 6
     maxVelocity: 50
