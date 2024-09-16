@@ -6,28 +6,52 @@ public class Switch : MonoBehaviour, IInteractable {
 
     [SerializeField] private GameObject target;
     [SerializeField] private AudioSource audioSource;
-    //[SerializeField] private float actionSpeed;
-    private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite[] switchTextures;
+    [SerializeField] private AudioClip[] targetSounds;
+    private Animator targetAnimator;
+    private AudioSource targetAudioSource;
     private bool isPressed;
     private const string TRIGGER = "Increase";
+    private const int ON = 1;
+    private const int OFF = 0;
 
     private void Awake() {
-        animator = target.GetComponent<Animator>();
-    }
-    private void SwitchOn() {
-        isPressed = true;
-        HandleAudio();
-        //animator.playbackTime = actionSpeed;
-        animator.SetTrigger(TRIGGER);
-    }
-    private void HandleAudio() {
-        if (!audioSource.isPlaying) {
-            audioSource.Play();
+        if (target != null) {
+            targetAnimator = target.GetComponent<Animator>();
+            if (target.TryGetComponent(out AudioSource audioSource)) {
+                targetAudioSource = audioSource;
+            }
+        } else { 
+            Debug.LogWarning("Error: Switch is missing target or target does not contain an Animator"); 
         }
     }
     public void Interaction() {
         if (!isPressed) {
             SwitchOn();
+        }
+    }
+    private void SwitchOn() {
+        isPressed = true;
+        SwitchSFX();
+        spriteRenderer.sprite = switchTextures[ON];
+        TargetAction();
+    }
+    private void TargetAction() {
+        targetAnimator.SetTrigger(TRIGGER);
+        if (targetAudioSource != null) {
+            StartCoroutine(ActionSounds());
+        }
+    }
+    IEnumerator ActionSounds() {
+        yield return new WaitForSeconds(targetAnimator.GetCurrentAnimatorStateInfo(0).length);
+        targetAudioSource.clip = targetSounds[1];
+        targetAudioSource.Play();
+        yield break;
+    }
+    private void SwitchSFX() {
+        if (!audioSource.isPlaying) {
+            audioSource.Play();
         }
     }
 }

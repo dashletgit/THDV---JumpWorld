@@ -212,7 +212,6 @@ namespace Fragsurf.Movement {
 
                     if (trigger.TryGetComponent(out IInteractable interactable)) { 
                         this.interactable = interactable;
-                        Debug.Log("In Range of Interactable");
                     }
                 }
             }
