@@ -9,10 +9,14 @@ public class Switch : MonoBehaviour, IInteractable {
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Sprite[] switchTextures;
     [SerializeField] private AudioClip[] targetSounds;
+    [Header("Repetable Parameters")]
+    [SerializeField] private bool isRepeatable;
+    [SerializeField] private float secondsToUseAgain;
     private Animator targetAnimator;
     private AudioSource targetAudioSource;
     private bool isPressed;
-    private const string TRIGGER = "Increase";
+    private const string TRIGGER = "Action";
+    private const string BOOL = "Action";
     private const int ON = 1;
     private const int OFF = 0;
 
@@ -38,15 +42,27 @@ public class Switch : MonoBehaviour, IInteractable {
         TargetAction();
     }
     private void TargetAction() {
-        targetAnimator.SetTrigger(TRIGGER);
-        if (targetAudioSource != null) {
-            StartCoroutine(ActionSounds());
+        if (isRepeatable) {
+            StartCoroutine(RepeatableAction());
+        } else {
+            StartCoroutine(SingleAction());
         }
     }
-    IEnumerator ActionSounds() {
+    IEnumerator RepeatableAction() {
+        targetAnimator.SetBool(BOOL, true);
+        yield return new WaitForSeconds(secondsToUseAgain);
+        isPressed = false;
+        spriteRenderer.sprite = switchTextures[OFF];
+        targetAnimator.SetBool(BOOL, false);
+        yield break;
+    }
+    IEnumerator SingleAction() {
+        targetAnimator.SetTrigger(TRIGGER);
         yield return new WaitForSeconds(targetAnimator.GetCurrentAnimatorStateInfo(0).length);
-        targetAudioSource.clip = targetSounds[1];
-        targetAudioSource.Play();
+        if (targetAudioSource != null) {
+            targetAudioSource.clip = targetSounds[1];
+            targetAudioSource.Play();
+        }
         yield break;
     }
     private void SwitchSFX() {
