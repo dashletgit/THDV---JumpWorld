@@ -449,7 +449,7 @@ MonoBehaviour:
     autoBhop: 1
     airJumpAllowed: 0
     gravity: 28
-    jumpForce: 10
+    jumpForce: 10.5
     airJumpMultiplier: 1.5
     freeLook: 1
     friction: 6
