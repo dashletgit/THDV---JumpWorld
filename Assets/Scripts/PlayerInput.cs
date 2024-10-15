@@ -16,7 +16,6 @@ public class PlayerInput : MonoBehaviour {
 
     private bool alwaysRun;
     public float HorizontalInputData() {
-
         if (Input.GetKey(moveLeft)) {
             return -1f;
         }

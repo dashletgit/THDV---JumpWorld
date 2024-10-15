@@ -109,7 +109,6 @@ namespace Fragsurf.Movement {
             _surfer.moveData.groundedTemp = _surfer.moveData.grounded;
             _surfer = null;
         }
-
         private void CalculateMovementVelocity () {
             switch (_surfer.moveType) {
 
@@ -128,6 +127,7 @@ namespace Fragsurf.Movement {
 
                     // air jump
                         if (canAirJump && _surfer.moveData.wishJump && _config.airJumpAllowed) {
+                            _surfer.moveData.velocity.y = 0f;
                             Jump(_config.airJumpMultiplier);
                         }
                 } 
