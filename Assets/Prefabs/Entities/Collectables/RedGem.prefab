@@ -304,4 +304,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 5648499125073760664}
   sprite: {fileID: 4124920065826147946}
-  collectableValue: 0
+  collectableValue: 1

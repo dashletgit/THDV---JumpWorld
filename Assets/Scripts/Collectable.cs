@@ -5,7 +5,7 @@ public class Collectable : MonoBehaviour
 {
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer sprite;
-    [SerializeField] private float collectableValue;
+    [SerializeField] private int collectableValue;
     private void Update() {
         Billboarding();
     }
@@ -22,6 +22,7 @@ public class Collectable : MonoBehaviour
     private void OnTriggerEnter(Collider other) {
         if (sprite.isVisible) {
             CollectableLogic();
+            GameManager.Instance.IncreaseGemCounter(collectableValue);
         }
     }
 }
