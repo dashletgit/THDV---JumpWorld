@@ -189,9 +189,6 @@ namespace Fragsurf.Movement {
         }
 
         private void Update() {
-            //Debug.Log("Speed: " + _moveData.speed);
-            //Debug.Log("VelocityY: " + _moveData.velocity.y);
-            //Debug.Log("Grounded: " + _moveData.grounded);
 
             UpdateMoveData();
 

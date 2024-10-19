@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 5252721729245186046}
   m_Layer: 9
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -250,7 +250,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5467285083954485886}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.000000119209275, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -442,7 +442,7 @@ MonoBehaviour:
   crouchingHeightMultiplier: 0.5
   crouchingSpeed: 10
   crouchingEnabled: 0
-  alwaysRun: 0
+  alwaysRun: 1
   jumpAudio: {fileID: 8300000, guid: 689e7ec24e5410941ad3438072ca716f, type: 3}
   fallAudio: {fileID: 8300000, guid: fc2caed43cfdd614e861a8883596c1f2, type: 3}
   movementConfig:
@@ -462,7 +462,7 @@ MonoBehaviour:
     airFriction: 0.4
     walkSpeed: 6
     sprintSpeed: 12
-    acceleration: 7
+    acceleration: 12
     deceleration: 1
     crouchSpeed: 4
     crouchAcceleration: 8

@@ -141,11 +141,13 @@ namespace Fragsurf.Movement {
                         slideSpeedCurrent = Mathf.Max (_config.maximumSlideSpeed, new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).magnitude);
                     }
 
+       
                     if (_surfer.moveData.velocity.magnitude > _config.minimumSlideSpeed && _surfer.moveData.slidingEnabled && _surfer.moveData.crouching && slideDelay <= 0f) {
 
                         if (!wasSliding)
                             slideSpeedCurrent = Mathf.Clamp (slideSpeedCurrent * _config.slideSpeedMultiplier, _config.minimumSlideSpeed, _config.maximumSlideSpeed);
 
+                      
                         wasSliding = true;
                         SlideMovement ();
                         return;
@@ -195,7 +197,7 @@ namespace Fragsurf.Movement {
                     _wishDir.Normalize();
                     _surfer.moveData.wishDir = _wishDir;
 
-                    Vector3 forwardVelocity = Vector3.Cross (groundNormal, Quaternion.AngleAxis (-90, Vector3.up) * new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z));
+                    Vector3 forwardVelocity = Vector3.Cross(groundNormal, Quaternion.AngleAxis(-90, Vector3.up) * new Vector3(_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z));
 
                     // Set the target speed of the player
                     float _wishSpeed = _wishDir.magnitude;
@@ -206,15 +208,15 @@ namespace Fragsurf.Movement {
                     Accelerate(_wishDir, _wishSpeed, accel * Mathf.Min(frictionMult, 1f), false);
 
                     float maxVelocityMagnitude = _config.maxVelocity;
-                    _surfer.moveData.velocity = Vector3.ClampMagnitude(new Vector3(_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z), maxVelocityMagnitude);
+                    _surfer.moveData.velocity = Vector3.ClampMagnitude (new Vector3 (_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z), maxVelocityMagnitude);
                     _surfer.moveData.velocity.y = yVel;
-
+                    
                     // Calculate how much slopes should affect movement
                     float yVelocityNew = forwardVelocity.normalized.y * new Vector3(_surfer.moveData.velocity.x, 0f, _surfer.moveData.velocity.z).magnitude;
 
                     // Apply the Y-movement from slopes
                     _surfer.moveData.velocity.y = yVelocityNew * (_wishDir.y < 0f ? 1.2f : 1.0f);
-                     float removableYVelocity = _surfer.moveData.velocity.y - yVelocityNew;
+                    float removableYVelocity = _surfer.moveData.velocity.y - yVelocityNew;
                     }
                 break;
 
@@ -666,7 +668,7 @@ namespace Fragsurf.Movement {
                 _surfer.moveData.viewTransform.localPosition = Vector3.Lerp (_surfer.moveData.viewTransformDefaultLocalPos - Vector3.down * heightDifference * 0.5f, _surfer.moveData.viewTransformDefaultLocalPos * crouchingHeight, crouchLerp);
 
         }
-        void SlideMovement () {
+        private void SlideMovement () {
             
             // Gradually change direction
             slideDirection += new Vector3 (groundNormal.x, 0f, groundNormal.z) * slideSpeedCurrent * _deltaTime;
