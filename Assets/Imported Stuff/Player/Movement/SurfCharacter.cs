@@ -22,6 +22,7 @@ namespace Fragsurf.Movement {
         private Vector3 _angles;
         private GameObject _colliderObject;
         private IInteractable interactable;
+        private Vector3 startingPosition;
 
         private MoveData _moveData = new MoveData();
         private SurfController _controller = new SurfController();
@@ -183,6 +184,7 @@ namespace Fragsurf.Movement {
             
             _collider.isTrigger = !solidCollider;
             _moveData.origin = transform.position;
+            startingPosition = transform.position;
 
             _moveData.useStepOffset = useStepOffset;
             _moveData.stepOffset = stepOffset;
@@ -231,6 +233,12 @@ namespace Fragsurf.Movement {
             _moveData.sprinting = playerInput.IsSprinting();
             HandleInteractions();
             playerCamera.FreeLookDisable(moveConfig.freeLook);
+
+            //Debug: Reset position
+            if (Input.GetKey(KeyCode.P)) {
+                moveData.velocity = Vector3.zero;
+                transform.position = startingPosition;
+            }
 
             if (playerInput.IsCrouching())
                 _moveData.crouching = true;

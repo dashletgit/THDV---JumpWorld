@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloatingText : MonoBehaviour
+[SelectionBase]
+public class FloatingText : MonoBehaviour 
 {
     [Header("Configuration")]
     [SerializeField] private bool allowRotation = false;
@@ -11,6 +12,7 @@ public class FloatingText : MonoBehaviour
     [SerializeField] private TextMesh textMesh;
 
     private Transform mainCamera;
+
     private void Start() {
         mainCamera = Camera.main.transform;
     }
@@ -18,11 +20,18 @@ public class FloatingText : MonoBehaviour
         if (allowRotation) {
             Billboarding();
         }
-        if (Vector3.Distance(transform.position, mainCamera.transform.position) < renderDistance) {
+        if (Vector3.Distance(transform.position, mainCamera.transform.position) < renderDistance && !ViewingFromBehind()) {
             textMesh.gameObject.SetActive(true);
         } else {
             textMesh.gameObject.SetActive(false);
         } 
+    }
+    private bool ViewingFromBehind() {
+        float dotProduct = Vector3.Dot(transform.forward, Camera.main.transform.forward);
+        if (dotProduct > 0.3) { 
+            return false;
+        } 
+        return true;
     }
     private void Billboarding() {
         transform.rotation = Quaternion.LookRotation(transform.position - mainCamera.position);

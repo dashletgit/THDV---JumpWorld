@@ -1,6 +1,7 @@
 using Fragsurf.Movement;
 using UnityEngine;
 
+[SelectionBase]
 public class Collectable : MonoBehaviour
 {
     [SerializeField] private AudioSource audioSource;
