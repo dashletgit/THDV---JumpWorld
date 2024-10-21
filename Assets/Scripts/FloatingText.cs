@@ -34,7 +34,8 @@ public class FloatingText : MonoBehaviour
         return true;
     }
     private void Billboarding() {
-        transform.rotation = Quaternion.LookRotation(transform.position - mainCamera.position);
+        Vector3 rotation = Quaternion.LookRotation(transform.position - mainCamera.position).eulerAngles;
+        transform.rotation = Quaternion.Euler(0f, rotation.y, 0f);
     }
 
 }

@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 218a3c5228e87b54f8102630bb1bfc1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PrefabBehaviour: 0
+  PrefabBehaviour: 1
   PrefabSourceAlignment: 4
   PrefabDestinationAlignment: 0
   Version: 2.1

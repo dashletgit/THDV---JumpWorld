@@ -24,4 +24,7 @@ public class GameManager : MonoBehaviour
     public void IncreaseGemCounter(int amount) { 
         playerGemCount += amount;
     }
+    public int GetGemCounter() { 
+        return playerGemCount;
+    }
 }

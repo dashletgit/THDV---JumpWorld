@@ -12,5 +12,4 @@ public class UIPlayerHUD : MonoBehaviour {
         gemCounter.text = "Gems: " + gems;
         speedCounter.text = "XSpeed: " + Mathf.Abs(xSpeed) + " " + "YSpeed: " + Mathf.Abs(ySpeed);
     }
-
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[SelectionBase]
 public class Switch : MonoBehaviour, IInteractable {
 
     [SerializeField] private GameObject target;
